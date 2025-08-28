@@ -10,7 +10,7 @@ description = 'ludoteca'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(java_version)
     }
 }
 
@@ -26,12 +26,12 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
-    runtimeOnly  'io.jsonwebtoken:jjwt-impl:0.11.5'
-    runtimeOnly  'io.jsonwebtoken:jjwt-jackson:0.11.5'
-    runtimeOnly 'org.postgresql:postgresql:42.7.4'
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    compileOnly 'org.jetbrains:annotations:24.0.1'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    implementation "io.jsonwebtoken:jjwt-api:${jjwt_version}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwt_version}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwt_version}"
+    runtimeOnly "org.postgresql:postgresql:${postgresql_version}"
+    compileOnly "org.projectlombok:lombok:${lombok_version}"
+    compileOnly "org.jetbrains:annotations:${jbr_annotations_version}"
+    annotationProcessor "org.projectlombok:lombok:${lombok_version}"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
