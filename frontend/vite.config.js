@@ -1,17 +1,16 @@
 import { fileURLToPath, URL } from "node:url";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import vue from "@vitejs/plugin-vue";
 
 // https://vite.dev/config/
 export default ({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) };
+  process.env = { ...process.env, ...loadEnv(mode, "../") };
 
   const backendServer = process.env.VITE_BACKEND_SERVER;
   const backendPort = process.env.VITE_BACKEND_PORT;
 
   return defineConfig({
-    envDir: "../",
     plugins: [tailwindcss(), vue()],
     server: {
       allowedHosts: true,
