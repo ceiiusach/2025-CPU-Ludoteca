@@ -1,4 +1,4 @@
-package seminfcpu.ludoteca.auth.entities;
+package seminfcpu.ludoteca.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

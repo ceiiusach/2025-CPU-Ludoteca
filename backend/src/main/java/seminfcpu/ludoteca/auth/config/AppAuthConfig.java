@@ -1,6 +1,6 @@
 package seminfcpu.ludoteca.auth.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,13 +13,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class AppAuthConfig {
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final UserDetailsService service;
+
+    public AppAuthConfig(@NotNull UserDetailsService service){
+        this.service = service;
+    }
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userDetailsService);
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider(service);
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

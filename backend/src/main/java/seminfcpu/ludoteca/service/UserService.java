@@ -1,13 +1,13 @@
 package seminfcpu.ludoteca.service;
 
-import jakarta.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import seminfcpu.ludoteca.entity.User;
-import seminfcpu.ludoteca.persistence.UserRespository;
+import seminfcpu.ludoteca.persistence.UserRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,13 +17,13 @@ import java.util.regex.Pattern;
 
 @Service
 public final class UserService implements UserDetailsService {
-    private final UserRespository repository;
+    private final UserRepository repository;
 
-    public UserService(@Nonnull UserRespository repository) {
+    public UserService(@NotNull UserRepository repository) {
         this.repository = repository;
     }
 
-    public void create(@Nonnull User user) {
+    public void create(@NotNull User user) {
         String encodedPassword = generateEncodedPassword(user.getPassword());
         user.setPassword(encodedPassword);
         validateUsuario(user);
@@ -43,7 +43,7 @@ public final class UserService implements UserDetailsService {
         return repository.findAll();
     }
 
-    public Optional<User> getById(@Nonnull UUID id) {
+    public Optional<User> getById(@NotNull UUID id) {
         return repository.findById(id);
     }
 
@@ -51,7 +51,7 @@ public final class UserService implements UserDetailsService {
         return repository.findByEmail(email);
     }
 
-    public User update(@Nonnull User user) {
+    public User update(@NotNull User user) {
         return repository.save(user);
     }
 
@@ -67,32 +67,32 @@ public final class UserService implements UserDetailsService {
             throw new IllegalArgumentException("El correo no puede ser nulo o vacío");
         }
 
-        if (id != null && !existsUser(id)) {
+        if (id != null && !exists(id)) {
             throw new IllegalArgumentException("No existe el voluntario");
         }
 
-        if (existsUserByCorreo(correo)) {
+        if (existsByEmail(correo)) {
             throw new IllegalArgumentException("El correo ingresado ya esta registrado");
         }
 
-        if (!isValidCorreo(correo)) {
+        if (!isEmailValid(correo)) {
             throw new IllegalArgumentException("El correo ingresado no es valido");
         }
     }
 
-    public boolean existsUser(UUID idVoluntario) {
-        return repository.existsUserById(idVoluntario);
+    public boolean exists(UUID id) {
+        return repository.existsUserById(id);
     }
 
-    public boolean existsUserByCorreo(String correo) {
-        return repository.existsUserByEmail(correo);
+    public boolean existsByEmail(String email) {
+        return repository.existsUserByEmail(email);
     }
 
-    private boolean isValidCorreo(String correo) {
-        System.out.println("Validando correo: " + correo);
+    private boolean isEmailValid(String email) {
+        System.out.println("Validando correo: " + email);
         String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(correo);
+        Matcher matcher = pattern.matcher(email);
         boolean isValid = matcher.matches();
         System.out.println("Correo válido: " + isValid);
         return isValid;

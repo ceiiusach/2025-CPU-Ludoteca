@@ -1,6 +1,6 @@
 package seminfcpu.ludoteca.controllers;
 
-import jakarta.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ public final class UserController {
 
     private final UserService service;
 
-    public UserController(@Nonnull UserService service) {
+    public UserController(@NotNull UserService service) {
         this.service = service;
     }
 
