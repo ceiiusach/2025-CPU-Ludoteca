@@ -4,9 +4,12 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seminfcpu.ludoteca.dto.ItemDto;
+import seminfcpu.ludoteca.dto.LoanDto;
 import seminfcpu.ludoteca.entity.Item;
+import seminfcpu.ludoteca.entity.Loan;
 import seminfcpu.ludoteca.entity.User;
 import seminfcpu.ludoteca.service.ItemService;
+import seminfcpu.ludoteca.service.LoanService;
 import seminfcpu.ludoteca.service.UserService;
 
 import java.util.List;
@@ -17,10 +20,12 @@ import java.util.UUID;
 public final class AdminController {
     private final UserService userService;
     private final ItemService itemService;
+    private final LoanService loanService;
 
-    public AdminController(UserService userService, @NotNull ItemService itemService) {
+    public AdminController(UserService userService, @NotNull ItemService itemService, LoanService loanService) {
         this.userService = userService;
         this.itemService = itemService;
+        this.loanService = loanService;
     }
 
     /**
@@ -124,5 +129,56 @@ public final class AdminController {
     public ResponseEntity<Boolean> deleteItem(@PathVariable UUID id) {
         itemService.delete(id);
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * Crea un préstamo de un ítem.
+     *
+     * @param loan Objeto {@link LoanDto} con la información.
+     * @return {@link ResponseEntity} con el objeto {@link Loan} creado y código <b>200 OK</b>.
+     */
+    @PostMapping("/loan")
+    public ResponseEntity<Loan> createLoan(@RequestBody LoanDto loan) {
+        try {
+            return ResponseEntity.ok(loanService.create(loan));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    /**
+     * Obtiene la lista completa de préstamos registrados en el sistema.
+     *
+     * @return {@link ResponseEntity} con la lista de objetos {@link Loan} y código <b>200 OK</b>.
+     */
+    @GetMapping("/loan")
+    public ResponseEntity<List<Loan>> getAllLoans() {
+        return ResponseEntity.ok(loanService.getAll());
+    }
+
+    /**
+     * Obtiene la lista de préstamos registrados para un usuario.
+     *
+     * @return {@link ResponseEntity} con la lista de objetos {@link Loan} y código <b>200 OK</b>.
+     */
+    @GetMapping("/loan/by-user-id/{userId}")
+    public ResponseEntity<List<Loan>> getAllUserLoans(@PathVariable UUID userId) {
+        return ResponseEntity.ok(loanService.getByUserId(userId));
+    }
+
+    /**
+     * Busca un préstamo por su ID.
+     *
+     * @param id Identificador único del préstamo.
+     * @return {@link ResponseEntity} con:
+     * <ul>
+     *     <li>El objeto {@link Loan} y <b>200 OK</b> si se encuentra.</li>
+     *     <li><b>404 NOT FOUND</b> si no existe un préstamo con ese ID.</li>
+     * </ul>
+     */
+    @GetMapping("/loan/by-id/{id}")
+    public ResponseEntity<Loan> getLoanById(@PathVariable UUID id) {
+        return ResponseEntity.of(loanService.getById(id));
     }
 }

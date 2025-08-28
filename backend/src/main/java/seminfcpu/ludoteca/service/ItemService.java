@@ -35,8 +35,8 @@ public final class ItemService {
         return repository.findById(id);
     }
 
-    public Item update(@NotNull Item user) {
-        return repository.save(user);
+    public Item update(@NotNull Item item) {
+        return repository.save(item);
     }
 
     public void delete(@NotNull UUID id) {

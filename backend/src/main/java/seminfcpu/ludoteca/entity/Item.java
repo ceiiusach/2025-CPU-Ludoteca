@@ -22,6 +22,10 @@ public class Item {
     private ItemType type;
     private int stock;
 
+    public void decreaseStock() {
+        this.stock--;
+    }
+
     public boolean isAvailable() {
         return stock > 0;
     }
