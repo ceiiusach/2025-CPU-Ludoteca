@@ -9,8 +9,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   plugins: [
     tailwindcss(),
-    vue(),
-    vueDevTools(),
+    vue()
   ],
   server:{
     allowedHosts: true
