@@ -1,6 +1,6 @@
 <script setup>
 import { ref, defineProps, onMounted } from 'vue';
-import MessageSuccess from './MessageSucces.vue';
+import MessageSuccess from '@/components/MessageSuccess.vue';
 
 const props = defineProps({
     Email: {

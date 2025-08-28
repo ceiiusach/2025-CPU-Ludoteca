@@ -1,10 +1,10 @@
 <script setup>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import ImgLudoteca from '../imgs/images.jpg';
-import FormRegister from '../components/FormRegister.vue';
-import FormValidation from '../components/FormValidation.vue';
-import MessageSucces from '../components/MessageSucces.vue';
+import ImgLudoteca from '@/imgs/images.jpg';
+import FormRegister from '@/components/FormRegister.vue';
+import FormValidation from '@/components/FormValidation.vue';
+import MessageSuccess from '@/components/MessageSuccess.vue';
 
 
 const router = useRouter();
