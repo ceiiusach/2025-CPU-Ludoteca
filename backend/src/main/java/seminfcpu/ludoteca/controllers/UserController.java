@@ -21,28 +21,6 @@ public final class UserController {
     }
 
     /**
-     * Registra un nuevo usuario en el sistema.
-     *
-     * @param usuario Objeto {@link User} recibido en el cuerpo de la petición, que contiene
-     *                los datos del usuario a crear (email, nombre, contraseña, rol, etc.).
-     * @return {@link ResponseEntity} con:
-     *         <ul>
-     *             <li><b>201 CREATED</b> y mensaje de éxito si el usuario fue creado correctamente.</li>
-     *             <li><b>400 BAD REQUEST</b> si ocurre algún error durante el proceso de creación.</li>
-     *         </ul>
-     */
-    @PostMapping("")
-    public ResponseEntity<String> register(@RequestBody User usuario) {
-        try {
-            service.create(usuario);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Usuario creado exitosamente");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al crear el usuario");
-        }
-    }
-
-    /**
      * Obtiene la lista completa de usuarios registrados en el sistema.
      *
      * @return {@link ResponseEntity} con la lista de objetos {@link User} y código <b>200 OK</b>.

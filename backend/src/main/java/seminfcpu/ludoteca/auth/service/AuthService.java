@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import seminfcpu.ludoteca.auth.dto.AuthResponse;
 import seminfcpu.ludoteca.auth.dto.LoginRequest;
 import seminfcpu.ludoteca.entity.User;
+import seminfcpu.ludoteca.model.UserRole;
 import seminfcpu.ludoteca.service.UserService;
 
 @Service
@@ -16,25 +17,29 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserService userService;
 
-    public AuthService(@NotNull JwtService jwtService, @NotNull AuthenticationManager authenticationManager, @NotNull UserService userService){
+    public AuthService(@NotNull JwtService jwtService, @NotNull AuthenticationManager authenticationManager, @NotNull UserService userService) {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.userService = userService;
     }
 
-    public AuthResponse authenticate(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
-                        request.getPassword()
-                )
-        );
+    public AuthResponse register(@NotNull LoginRequest request) {
+        User user = new User();
+        user.setEmail(request.getEmail());
+        user.setPassword(request.getPassword());
+        user.setRole(UserRole.STUDENT);
+        userService.create(user);
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        String jwtToken = jwtService.generateToken(user.generateExtraClaims(), user);
+        return AuthResponse.builder().token(jwtToken).userId(user.getId()).build();
+    }
+
+    public AuthResponse authenticate(@NotNull LoginRequest request) {
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
         User user = userService.getByEmail(request.getEmail());
         String jwtToken = jwtService.generateToken(user.generateExtraClaims(), user);
-        return AuthResponse.builder()
-                .token(jwtToken)
-                .userId(user.getId())
-                .build();
+        return AuthResponse.builder().token(jwtToken).userId(user.getId()).build();
     }
 }

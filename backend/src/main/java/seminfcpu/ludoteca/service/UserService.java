@@ -23,12 +23,12 @@ public final class UserService implements UserDetailsService {
         this.repository = repository;
     }
 
-    public void create(@NotNull User user) {
+    public User create(@NotNull User user) {
         String encodedPassword = generateEncodedPassword(user.getPassword());
         user.setPassword(encodedPassword);
         validateUsuario(user);
         try {
-            repository.save(user);
+            return repository.save(user);
         } catch (Exception e) {
             throw new RuntimeException("Error al crear el usuario", e);
         }
