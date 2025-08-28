@@ -20,6 +20,11 @@ export default ({ mode }) => {
           changeOrigin: true,
           secure: false,
         },
+        "/auth": {
+            target: `http://${backendServer}:${backendPort}`,
+            changeOrigin: true,
+            secure: false,
+        },
       },
     },
     resolve: {
