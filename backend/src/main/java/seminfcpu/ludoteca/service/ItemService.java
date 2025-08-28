@@ -1,29 +1,45 @@
 package seminfcpu.ludoteca.service;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import seminfcpu.ludoteca.dto.Item;
+import seminfcpu.ludoteca.dto.ItemDto;
+import seminfcpu.ludoteca.entity.Item;
 import seminfcpu.ludoteca.persistence.ItemRepository;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
 @Service
-public class ItemService {
+public final class ItemService {
+    private final ItemRepository repository;
 
-    private final ItemRepository itemRepository;
-
-    public ItemService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
+    public ItemService(ItemRepository repository) {
+        this.repository = repository;
     }
 
-    public void crearItem(Item item) {
-        seminfcpu.ludoteca.entity.Item newItem = new seminfcpu.ludoteca.entity.Item();
-        newItem.setName(item.getName());
-        newItem.setDescription(item.getDescription());
-        newItem.setType(item.getType());
-        newItem.setStock(item.getStock());
-        if (newItem.getStock() > 0) {
-            newItem.setAvailable(true);
-        } else {
-            newItem.setAvailable(false);
-        }
-        itemRepository.save(newItem);
+    public Item create(ItemDto itemDto) {
+        Item newItem = new Item();
+        newItem.setName(itemDto.getName());
+        newItem.setDescription(itemDto.getDescription());
+        newItem.setType(itemDto.getType());
+        newItem.setStock(itemDto.getStock());
+        return repository.save(newItem);
+    }
+
+    public List<Item> getAll() {
+        return repository.findAll();
+    }
+
+    public Optional<Item> getById(@NotNull UUID id) {
+        return repository.findById(id);
+    }
+
+    public Item update(@NotNull Item user) {
+        return repository.save(user);
+    }
+
+    public void delete(@NotNull UUID id) {
+        repository.deleteById(id);
     }
 }

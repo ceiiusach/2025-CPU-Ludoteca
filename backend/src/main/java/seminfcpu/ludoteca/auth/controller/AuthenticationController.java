@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import seminfcpu.ludoteca.auth.dto.AuthResponse;
 import seminfcpu.ludoteca.auth.dto.LoginRequest;
 import seminfcpu.ludoteca.auth.service.AuthService;
-import seminfcpu.ludoteca.entity.User;
 
 @RestController
 @RequestMapping("/auth")
@@ -44,8 +43,8 @@ public class AuthenticationController {
     /**
      * Registra un nuevo usuario en el sistema.
      *
-     * @param usuario Objeto {@link User} recibido en el cuerpo de la petición, que contiene
-     *                los datos del usuario a crear (email, nombre, contraseña, rol, etc.).
+     * @param request Objeto {@link LoginRequest} con los campos necesarios para autenticación
+     *                (email y contraseña).
      * @return {@link ResponseEntity} con:
      *         <ul>
      *             <li><b>201 CREATED</b> y mensaje de éxito si el usuario fue creado correctamente.</li>
@@ -53,9 +52,9 @@ public class AuthenticationController {
      *         </ul>
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody LoginRequest usuario) {
+    public ResponseEntity<AuthResponse> register(@RequestBody LoginRequest request) {
         try {
-            return ResponseEntity.ok(service.register(usuario));
+            return ResponseEntity.ok(service.register(request));
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);

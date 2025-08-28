@@ -23,11 +23,10 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String name;
-    private static String ROLE = "ROLE_USER";
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(ROLE));
+        return List.of(new SimpleGrantedAuthority(role.toString()));
     }
 
     @Override

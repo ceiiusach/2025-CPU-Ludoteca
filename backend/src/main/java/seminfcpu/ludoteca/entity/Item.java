@@ -3,7 +3,6 @@ package seminfcpu.ludoteca.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import seminfcpu.ludoteca.model.ItemType;
-import seminfcpu.ludoteca.model.UserRole;
 
 import java.util.UUID;
 
@@ -21,6 +20,9 @@ public class Item {
     private String name;
     private String description;
     private ItemType type;
-    private boolean available;
     private int stock;
+
+    public boolean isAvailable() {
+        return stock > 0;
+    }
 }

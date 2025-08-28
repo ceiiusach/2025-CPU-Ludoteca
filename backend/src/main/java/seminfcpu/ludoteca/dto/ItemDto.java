@@ -6,7 +6,7 @@ import seminfcpu.ludoteca.model.ItemType;
 
 @Getter
 @Setter
-public class Item {
+public class ItemDto {
     private String name;
     private String description;
     private ItemType type;
