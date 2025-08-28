@@ -6,8 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.stereotype.Service;
 import seminfcpu.ludoteca.auth.entities.AuthResponse;
 import seminfcpu.ludoteca.auth.entities.LoginRequest;
-import seminfcpu.ludoteca.auth.entities.Usuario;
 import seminfcpu.ludoteca.entity.User;
+import seminfcpu.ludoteca.service.UserService;
 
 @Service
 public class AuthService {
@@ -26,7 +26,7 @@ public class AuthService {
                 )
         );
 
-        Usuario user = userService.getUserByEmail(request.getEmail());
+        User user = userService.getByEmail(request.getEmail());
         String jwtToken = jwtService.generateToken(user.generateExtraClaims(), user);
         return AuthResponse.builder()
                 .token(jwtToken)

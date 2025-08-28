@@ -5,7 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seminfcpu.ludoteca.entity.User;
-import seminfcpu.ludoteca.service.UsuarioService;
+import seminfcpu.ludoteca.service.UserService;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,9 +14,9 @@ import java.util.UUID;
 @RequestMapping("/api/v1/user")
 public final class UserController {
 
-    private final UsuarioService service;
+    private final UserService service;
 
-    public UserController(@Nonnull UsuarioService service) {
+    public UserController(@Nonnull UserService service) {
         this.service = service;
     }
 

@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import seminfcpu.ludoteca.dto.Item;
-import seminfcpu.ludoteca.entity.User;
 import seminfcpu.ludoteca.service.ItemService;
-import seminfcpu.ludoteca.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/v1/admin")
