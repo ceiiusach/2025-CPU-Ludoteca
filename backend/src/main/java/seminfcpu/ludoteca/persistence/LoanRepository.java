@@ -11,4 +11,5 @@ import java.util.UUID;
 @Repository
 public interface LoanRepository extends JpaRepository<Loan, UUID> {
     @NotNull List<Loan> findByUserId(UUID id);
+    @NotNull List<Loan> findByPending(boolean pending);
 }

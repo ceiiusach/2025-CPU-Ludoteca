@@ -25,4 +25,5 @@ public class Loan {
     private Item item;
     private LocalDateTime date;
     private int estimatedMinutes;
+    private boolean pending;
 }

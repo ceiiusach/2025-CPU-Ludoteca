@@ -1,5 +1,6 @@
 package seminfcpu.ludoteca.service;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -11,18 +12,17 @@ import java.time.LocalDateTime;
 
 
 @Service
-public class EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
+public final class EmailService {
+    private final JavaMailSender mailSender;
+    private final UserService userService;
 
-    @Autowired
-    private UserService userService;
+    public EmailService(@NotNull JavaMailSender mailSender, UserService userService) {
+        this.mailSender = mailSender;
+        this.userService = userService;
+    }
 
     public boolean sendVerificationCode(String toEmail) {
-        User responseUser = userService.getByEmail(toEmail);
-        if (responseUser == null){
-            return false;
-        }
+        User responseUser = userService.getByEmail(toEmail).orElseThrow();
         String code = generate6DigitCode();
         responseUser.setCode(code);
         responseUser.setExpirationCode(LocalDateTime.now().plusMinutes(5));
@@ -46,8 +46,7 @@ public class EmailService {
     }
 
     public boolean verifyCode(String email, String inputCode) {
-        User user = userService.getByEmail(email);
-        if (user == null) return false;
+        User user = userService.getByEmail(email).orElseThrow();
         if (user.getCode() == null || user.getExpirationCode() == null) return false;
         if (!user.getCode().equals(inputCode)) return false;
         if (user.getExpirationCode().isBefore(LocalDateTime.now())) return false;

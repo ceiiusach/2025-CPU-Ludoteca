@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import seminfcpu.ludoteca.dto.UserDto;
 import seminfcpu.ludoteca.entity.User;
 import seminfcpu.ludoteca.persistence.UserRepository;
 
@@ -39,11 +40,18 @@ public final class UserService implements UserDetailsService {
         return repository.findById(id);
     }
 
-    public User getByEmail(String email) {
+    public Optional<User> getByEmail(String email) {
         return repository.findByEmail(email);
     }
 
     public User update(@NotNull User user) {
+        return repository.save(user);
+    }
+
+    public User update(@NotNull UserDto userDto) {
+        User user = getById(userDto.getId()).orElseThrow();
+        user.setRole(userDto.getRole());
+        user.setEmail(userDto.getEmail());
         return repository.save(user);
     }
 
@@ -92,6 +100,6 @@ public final class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return getByEmail(username);
+        return getByEmail(username).orElseThrow();
     }
 }

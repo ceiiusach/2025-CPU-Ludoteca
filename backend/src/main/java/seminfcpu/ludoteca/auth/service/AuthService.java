@@ -12,7 +12,7 @@ import seminfcpu.ludoteca.model.UserRole;
 import seminfcpu.ludoteca.service.UserService;
 
 @Service
-public class AuthService {
+public final class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final AppAuthConfig appAuthConfig;
@@ -39,7 +39,7 @@ public class AuthService {
     public AuthResponse authenticate(@NotNull LoginRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        User user = userService.getByEmail(request.getEmail());
+        User user = userService.getByEmail(request.getEmail()).orElseThrow();
         String jwtToken = jwtService.generateToken(user.generateExtraClaims(), user);
         return AuthResponse.builder().token(jwtToken).userId(user.getId()).build();
     }

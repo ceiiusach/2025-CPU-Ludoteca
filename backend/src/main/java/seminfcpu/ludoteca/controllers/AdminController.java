@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import seminfcpu.ludoteca.dto.ItemDto;
 import seminfcpu.ludoteca.dto.LoanDto;
+import seminfcpu.ludoteca.dto.UserDto;
 import seminfcpu.ludoteca.entity.Item;
 import seminfcpu.ludoteca.entity.Loan;
 import seminfcpu.ludoteca.entity.User;
@@ -34,8 +35,8 @@ public final class AdminController {
      * @return {@link ResponseEntity} con la lista de objetos {@link User} y código <b>200 OK</b>.
      */
     @GetMapping("/user")
-    public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAll());
+    public ResponseEntity<List<UserDto>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAll().stream().map(UserDto::new).toList());
     }
 
     /**
@@ -49,8 +50,8 @@ public final class AdminController {
      * </ul>
      */
     @GetMapping("/user/by-id/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable UUID id) {
-        return ResponseEntity.of(userService.getById(id));
+    public ResponseEntity<UserDto> getUserById(@PathVariable UUID id) {
+        return ResponseEntity.of(UserDto.optional(userService.getById(id).orElse(null)));
     }
 
     /**
@@ -64,9 +65,8 @@ public final class AdminController {
      * </ul>
      */
     @GetMapping("/user/by-email/{email:.+}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        User user = userService.getByEmail(email);
-        return (user != null) ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.of(UserDto.optional(userService.getByEmail(email).orElse(null)));
     }
 
     /**
@@ -76,8 +76,8 @@ public final class AdminController {
      * @return {@link ResponseEntity} con el objeto {@link User} actualizado y código <b>200 OK</b>.
      */
     @PutMapping("/user")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        return ResponseEntity.ok(userService.update(user));
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
+        return ResponseEntity.of(UserDto.optional(userService.update(user)));
     }
 
     /**
@@ -180,5 +180,27 @@ public final class AdminController {
     @GetMapping("/loan/by-id/{id}")
     public ResponseEntity<Loan> getLoanById(@PathVariable UUID id) {
         return ResponseEntity.of(loanService.getById(id));
+    }
+
+    /**
+     * Obtiene la lista completa de préstamos pendientes en el sistema.
+     *
+     * @return {@link ResponseEntity} con la lista de objetos {@link Loan} y código <b>200 OK</b>.
+     */
+    @GetMapping("/loan/pending")
+    public ResponseEntity<List<Loan>> getPendingLoans() {
+        return ResponseEntity.ok(loanService.getAllPending());
+    }
+
+    /**
+     * Elimina un préstamo existente a partir de su ID.
+     *
+     * @param id Identificador único del préstamo a eliminar.
+     * @return {@link ResponseEntity} con código <b>200 OK</b> si la eliminación fue exitosa.
+     */
+    @DeleteMapping("/loan/{id}")
+    public ResponseEntity<Boolean> deleteLoan(@PathVariable UUID id) {
+        itemService.delete(id);
+        return ResponseEntity.ok().build();
     }
 }

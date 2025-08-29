@@ -16,16 +16,15 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthenticationController {
-    @Autowired
-    private AuthService service;
-    @Autowired
-    private EmailService emailService;
-    @Autowired
-    private UserService userService;
+public final class AuthenticationController {
+    private final AuthService service;
+    private final EmailService emailService;
+    private final UserService userService;
 
-    public AuthenticationController(@NotNull AuthService service) {
+    public AuthenticationController(@NotNull AuthService service, EmailService emailService, UserService userService) {
         this.service = service;
+        this.emailService = emailService;
+        this.userService = userService;
     }
 
     /**
@@ -54,10 +53,10 @@ public class AuthenticationController {
      * @param request Objeto {@link LoginRequest} con los campos necesarios para autenticación
      *                (email y contraseña).
      * @return {@link ResponseEntity} con:
-     *         <ul>
-     *             <li><b>201 CREATED</b> y mensaje de éxito si el usuario fue creado correctamente.</li>
-     *             <li><b>400 BAD REQUEST</b> si ocurre algún error durante el proceso de creación.</li>
-     *         </ul>
+     * <ul>
+     *     <li><b>201 CREATED</b> y mensaje de éxito si el usuario fue creado correctamente.</li>
+     *     <li><b>400 BAD REQUEST</b> si ocurre algún error durante el proceso de creación.</li>
+     * </ul>
      */
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody LoginRequest request) {
@@ -80,11 +79,10 @@ public class AuthenticationController {
     }
 
     @PostMapping("/validate")
-    public  ResponseEntity<String> validateCode(
-            @RequestParam String email,
-            @RequestParam String code) {
-        User user = userService.getByEmail(email);
-        if (user.getExpirationCode().isBefore(LocalDateTime.now())) return ResponseEntity.badRequest().body("Código inválido o expirado.");
+    public ResponseEntity<String> validateCode(@RequestParam String email, @RequestParam String code) {
+        User user = userService.getByEmail(email).orElseThrow();
+        if (user.getExpirationCode().isBefore(LocalDateTime.now()))
+            return ResponseEntity.badRequest().body("Código inválido o expirado.");
         boolean valid = emailService.verifyCode(email, code);
         if (valid) {
             return ResponseEntity.ok("Código válido.");

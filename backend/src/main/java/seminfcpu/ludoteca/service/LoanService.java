@@ -35,6 +35,7 @@ public final class LoanService {
         loan.setItem(item);
         loan.setEstimatedMinutes(loanDto.getEstimatedMinutes());
         loan.setDate(LocalDateTime.now());
+        loan.setPending(true);
         loan = repository.save(loan);
 
         item.decreaseStock();
@@ -56,6 +57,11 @@ public final class LoanService {
     @NotNull
     public Optional<Loan> getById(@NotNull UUID id) {
         return repository.findById(id);
+    }
+
+    @NotNull
+    public List<Loan> getAllPending() {
+        return repository.findByPending(true);
     }
 
     @NotNull

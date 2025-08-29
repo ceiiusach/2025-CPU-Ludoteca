@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class JwtService {
+public final class JwtService {
     @Value("${jwt.secret_key}")
     private String SECRET_KEY;
     private static final long TOKEN_EXPIRATION_TIME_SECONDS = 60 * 30;
