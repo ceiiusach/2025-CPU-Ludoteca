@@ -9,10 +9,14 @@ import seminfcpu.ludoteca.auth.dto.AuthResponse;
 import seminfcpu.ludoteca.auth.dto.LoginRequest;
 import seminfcpu.ludoteca.auth.service.AuthService;
 import seminfcpu.ludoteca.entity.User;
+import seminfcpu.ludoteca.entity.ValidationEmail;
+import seminfcpu.ludoteca.model.UserRole;
 import seminfcpu.ludoteca.service.EmailService;
 import seminfcpu.ludoteca.service.UserService;
+import seminfcpu.ludoteca.service.ValidationService;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequestMapping("/auth")
@@ -20,6 +24,8 @@ public final class AuthenticationController {
     private final AuthService service;
     private final EmailService emailService;
     private final UserService userService;
+    @Autowired
+    private ValidationService validationService;
 
     public AuthenticationController(@NotNull AuthService service, EmailService emailService, UserService userService) {
         this.service = service;
@@ -59,9 +65,10 @@ public final class AuthenticationController {
      * </ul>
      */
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody LoginRequest request) {
+    public ResponseEntity<User> register(@RequestBody User request) {
         try {
-            return ResponseEntity.ok(service.register(request));
+            request.setRole(UserRole.STUDENT);
+            return ResponseEntity.ok(userService.create(request));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
@@ -79,7 +86,7 @@ public final class AuthenticationController {
 
     @PostMapping("/validate")
     public ResponseEntity<String> validateCode(@RequestParam String email, @RequestParam String code) {
-        User user = userService.getByEmail(email).orElseThrow();
+        ValidationEmail user = validationService.getValidation(email);
         if (user.getExpirationCode().isBefore(LocalDateTime.now()))
             return ResponseEntity.badRequest().body("Código inválido o expirado.");
         boolean valid = emailService.verifyCode(email, code);

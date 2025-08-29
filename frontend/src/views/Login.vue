@@ -5,7 +5,6 @@ import ImgLudoteca from '@/imgs/images.jpg';
 import FormRegister from '@/components/FormRegister.vue';
 import FormValidation from '@/components/FormValidation.vue';
 import MessageSuccess from '@/components/MessageSuccess.vue';
-import httpClient from '@/http-common';
 import { login } from '@/services/authService'
 
 
@@ -13,6 +12,7 @@ const router = useRouter();
 const email = ref('');
 const emailRegister = ref('');
 const password = ref('');
+const passwordRegister = ref('');
 const errorMessage = ref(false);
 const showModalRegister = ref(false);
 const showModalValidation = ref(false);
@@ -26,6 +26,10 @@ const handleLogin = async () => {
   error.value = ''
   try {
     await login({ email: email.value, password: password.value })
+    messageSuccess.value = true;
+    setTimeout(() => {
+      showModalSuccess.value = false;
+    }, 3000);
     router.push('/items')
   } catch (e) {
     error.value = e?.message ?? 'Error al iniciar sesión'
@@ -38,15 +42,29 @@ const showModalRegisterOpen = () => {
     showModalRegister.value = true;
 }
 
+const handleOpenValidation = (regEmail, regPassword) => {
+  emailRegister.value = regEmail;
+  passwordRegister.value = regPassword;
+  showModalValidation.value = true;
+};
+
 </script>
 
 <template>
     <div class="min-h-screen w-screen flex bg-gray-100">
-        <FormRegister v-if="showModalRegister" @onCloseRegister="showModalRegister = false"
-            @onOpenValidation="showModalValidation = true" />
+        <FormRegister
+            v-if="showModalRegister"
+            @onCloseRegister="showModalRegister = false"
+            @onOpenValidation="handleOpenValidation"
+            />
 
-        <FormValidation v-if="showModalValidation" :Email="emailRegister"
-            @onCloseValidation="showModalValidation = false" />
+        <FormValidation
+            v-if="showModalValidation"
+            :Email="emailRegister"
+            :Password="passwordRegister"
+            @onCloseValidation="showModalValidation = false"
+            />
+
         <MessageSuccess v-if="showModalSuccess" message="Inicio Sesion exitoso!" />
         <div class="w-1/2 h-screen bg-white p-8 flex flex-col justify-center items-center">
             <div class="w-full h-3/4 p-6 flex flex-col justify-center bg-white">

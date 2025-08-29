@@ -1,5 +1,6 @@
 <script setup>
 import {ref} from 'vue';
+import httpClient from '@/http-common';
 
 const emit = defineEmits(['onCloseRegister', 'onOpenValidation']);
 
@@ -19,11 +20,20 @@ const SubmitRegister = async () => {
     password: password.value
   };
 
-  // Aquí iría la lógica para enviar los datos al servidor
-  // Si es exitoso:
-  errorMessage.value = "";
-  emit("onCloseRegister");       // cerrar modal de registro
-  emit("onOpenValidation");     // abrir modal de validación en el padre
+  httpClient.post(`/auth/request?email=${encodeURIComponent(data.email)}`)
+  .then((response) => {
+    if (response.status === 200) {
+      errorMessage.value = '';
+      emit('onCloseRegister');
+      emit('onOpenValidation', email.value, password.value);
+    } else {
+      errorMessage.value = 'Error en el registro. Inténtalo de nuevo.';
+    }
+  })
+  .catch(() => {
+    errorMessage.value = 'Error en el registro. Inténtalo de nuevo.';
+  });
+   
 };
 </script>
 

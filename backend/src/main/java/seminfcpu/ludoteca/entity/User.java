@@ -24,8 +24,6 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String name;
-    private String code;
-    private LocalDateTime expirationCode;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

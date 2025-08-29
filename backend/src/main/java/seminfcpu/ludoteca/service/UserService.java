@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import seminfcpu.ludoteca.dto.UserDto;
 import seminfcpu.ludoteca.entity.User;
+import seminfcpu.ludoteca.model.UserRole;
 import seminfcpu.ludoteca.persistence.UserRepository;
 
 import java.util.List;
@@ -30,6 +31,10 @@ public final class UserService implements UserDetailsService {
 
     public List<User> getAll() {
         return repository.findAll();
+    }
+
+    public List<User> listStudents(){
+        return repository.findByRole(UserRole.STUDENT);
     }
 
     public Optional<User> getById(@NotNull UUID id) {
