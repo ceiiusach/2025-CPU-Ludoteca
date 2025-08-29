@@ -33,6 +33,7 @@ public class SecurityConfig {
                     customizeRequests.requestMatchers("/api/v1/item/**").authenticated();
                     customizeRequests.requestMatchers("/api/v1/user/**").authenticated();
                     customizeRequests.requestMatchers("/api/v1/admin/**").hasRole("ADMIN");
+                    customizeRequests.requestMatchers("/api/v1/loan/**").authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(AbstractHttpConfigurer::disable)

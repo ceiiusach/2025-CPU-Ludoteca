@@ -132,22 +132,6 @@ public final class AdminController {
     }
 
     /**
-     * Crea un préstamo de un ítem.
-     *
-     * @param loan Objeto {@link LoanDto} con la información.
-     * @return {@link ResponseEntity} con el objeto {@link Loan} creado y código <b>200 OK</b>.
-     */
-    @PostMapping("/loan")
-    public ResponseEntity<Loan> createLoan(@RequestBody LoanDto loan) {
-        try {
-            return ResponseEntity.ok(loanService.create(loan));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    /**
      * Obtiene la lista completa de préstamos registrados en el sistema.
      *
      * @return {@link ResponseEntity} con la lista de objetos {@link Loan} y código <b>200 OK</b>.
