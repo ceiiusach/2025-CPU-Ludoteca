@@ -6,6 +6,7 @@ import FormRegister from '@/components/FormRegister.vue';
 import FormValidation from '@/components/FormValidation.vue';
 import MessageSuccess from '@/components/MessageSuccess.vue';
 import httpClient from '@/http-common';
+import { login } from '@/services/authService'
 
 
 const router = useRouter();
@@ -16,26 +17,21 @@ const errorMessage = ref(false);
 const showModalRegister = ref(false);
 const showModalValidation = ref(false);
 const showModalSuccess = ref(false);
+const loading = ref(false)
+const error = ref('')
 
 
-const handleLogin = () => {
-    const data = {
-        email: email.value,
-        password: password.value
-    };
-    httpClient.post('/auth/login', data)
-        .then((response) => {
-            if (response.status != 200)
-                return;
-
-            errorMessage.value = false;
-            showModalSuccess.value = true;
-            setTimeout(() => {
-                showModalSuccess.value = false;
-            }, 3000);
-        }).catch(() => {
-            errorMessage.value = true;
-        });
+const handleLogin = async () => {
+  loading.value = true
+  error.value = ''
+  try {
+    await login({ email: email.value, password: password.value })
+    router.push('/items')
+  } catch (e) {
+    error.value = e?.message ?? 'Error al iniciar sesión'
+  } finally {
+    loading.value = false
+  }
 }
 
 const showModalRegisterOpen = () => {
