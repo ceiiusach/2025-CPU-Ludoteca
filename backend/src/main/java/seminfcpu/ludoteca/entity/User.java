@@ -7,6 +7,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import seminfcpu.ludoteca.model.UserRole;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Data
@@ -23,6 +24,9 @@ public class User implements UserDetails {
     private String email;
     private String password;
     private String name;
+
+    private String code;
+    private LocalDateTime expirationCode;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -1,20 +1,28 @@
 package seminfcpu.ludoteca.auth.controller;
 
 import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import seminfcpu.ludoteca.auth.dto.AuthResponse;
 import seminfcpu.ludoteca.auth.dto.LoginRequest;
 import seminfcpu.ludoteca.auth.service.AuthService;
+import seminfcpu.ludoteca.entity.User;
+import seminfcpu.ludoteca.service.EmailService;
+import seminfcpu.ludoteca.service.UserService;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationController {
-    private final AuthService service;
+    @Autowired
+    private AuthService service;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private UserService userService;
 
     public AuthenticationController(@NotNull AuthService service) {
         this.service = service;
@@ -58,6 +66,30 @@ public class AuthenticationController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+    }
+
+    @PostMapping("/request")
+    public ResponseEntity<String> requestCode(@RequestParam String email) {
+        boolean sent = emailService.sendVerificationCode(email);
+        if (sent) {
+            return ResponseEntity.ok("Código enviado exitosamente");
+        } else {
+            return ResponseEntity.badRequest().body("No se pudo enviar el código");
+        }
+    }
+
+    @PostMapping("/validate")
+    public  ResponseEntity<String> validateCode(
+            @RequestParam String email,
+            @RequestParam String code) {
+        User user = userService.getByEmail(email);
+        if (user.getExpirationCode().isBefore(LocalDateTime.now())) return ResponseEntity.badRequest().body("Código inválido o expirado.");
+        boolean valid = emailService.verifyCode(email, code);
+        if (valid) {
+            return ResponseEntity.ok("Código válido.");
+        } else {
+            return ResponseEntity.badRequest().body("Código inválido o expirado.");
         }
     }
 }
