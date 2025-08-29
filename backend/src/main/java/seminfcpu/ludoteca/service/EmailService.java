@@ -7,6 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import seminfcpu.ludoteca.entity.Loan;
 import seminfcpu.ludoteca.entity.User;
+import seminfcpu.ludoteca.entity.ValidationEmail;
 
 import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
@@ -19,6 +20,8 @@ import java.time.format.DateTimeFormatterBuilder;
 public final class EmailService {
     private final JavaMailSender mailSender;
     private final UserService userService;
+    @Autowired
+    private ValidationService validationService;
 
     public EmailService(@NotNull JavaMailSender mailSender, UserService userService) {
         this.mailSender = mailSender;
@@ -26,22 +29,33 @@ public final class EmailService {
     }
 
     public boolean sendVerificationCode(String toEmail) {
-        User responseUser = userService.getByEmail(toEmail).orElseThrow();
+        ValidationEmail responseUser = validationService.getValidation(toEmail);
+
         String code = generate6DigitCode();
-        responseUser.setCode(code);
-        responseUser.setExpirationCode(LocalDateTime.now().plusMinutes(5));
-        userService.update(responseUser);
+        LocalDateTime expiration = LocalDateTime.now().plusMinutes(5);
+
+        if (responseUser == null) {
+            responseUser = new ValidationEmail();
+            responseUser.setEmail(toEmail);
+            responseUser.setCode(code);
+            responseUser.setExpirationCode(expiration);
+            validationService.update(responseUser); // usar .save para nuevo
+        } else {
+            // Si existe, actualiza solo el código y expiración
+            responseUser.setCode(code);
+            responseUser.setExpirationCode(expiration);
+            validationService.update(responseUser); // usar .update para existente
+        }
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
         message.setSubject("Código de verificación");
         message.setText("Tu código de verificación es: " + code);
         mailSender.send(message);
 
-        responseUser.setCode(code);
-        responseUser.setExpirationCode(LocalDateTime.now().plusMinutes(5));
-
         return true;
     }
+
 
     private String generate6DigitCode() {
         SecureRandom random = new SecureRandom();
@@ -50,14 +64,14 @@ public final class EmailService {
     }
 
     public boolean verifyCode(String email, String inputCode) {
-        User user = userService.getByEmail(email).orElseThrow();
+        ValidationEmail user = validationService.getValidation(email);
         if (user.getCode() == null || user.getExpirationCode() == null) return false;
         if (!user.getCode().equals(inputCode)) return false;
         if (user.getExpirationCode().isBefore(LocalDateTime.now())) return false;
 
         user.setExpirationCode(null);
         user.setCode(null);
-        userService.update(user);
+        validationService.update(user);
 
         return true;
     }

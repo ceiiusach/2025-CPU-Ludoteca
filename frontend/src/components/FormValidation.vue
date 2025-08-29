@@ -1,13 +1,13 @@
 <script setup>
 import { ref, defineProps, onMounted } from 'vue';
 import MessageSuccess from '@/components/MessageSuccess.vue';
+import httpClient from '@/http-common';
 
 const props = defineProps({
-    Email: {
-        type: String,
-        required: true
-    }
+  Email: { type: String, required: true },
+  Password: { type: String, required: false }
 });
+
 
 const error = ref(false);
 const success = ref(false);
@@ -43,17 +43,19 @@ const handleBackspace = (index, event) => {
 
 const sendRecoveryEmail = async () => {
   error.value = false;
-  try {
-    /*const response = await ForgotPassword(email);
-    if (response.status === 200) {
-      success.value = true;
-      setTimeout(() => (success.value = false), 3000);
-    } else error.value = true;
-     */
-  } catch (e) {
-    console.error(e);
-    alert('Error al enviar el código.');
-  }
+  
+  httpClient.post(`/auth/request?email=${encodeURIComponent(showEmail.value)}`)
+    .then((response) => {
+      if (response.status === 200) {
+        alert('Código reenviado. Revisa tu correo.');
+      } else {
+        alert('Error al reenviar el código. Inténtalo de nuevo.');
+      }
+    })
+    .catch(() => {
+      alert('Error al reenviar el código. Inténtalo de nuevo.');
+    });
+
 };
 
 const verify = async () => {
@@ -63,23 +65,38 @@ const verify = async () => {
     return;
   }
 
-  try {
-    console.log("Verifying code for email:", email, "with code:", code);
-    /*const response = await VerifyCode(email, code);
-    if (response.status === 200) {
-      success.value = true;
-      setTimeout(() => {
-        success.value = false;
-        router.push({ name: 'ResetPassword', query: { email, code }});
-      }, 3000);
-    } else{
+  httpClient.post(`/auth/validate?email=${encodeURIComponent(showEmail.value)}&code=${encodeURIComponent(code)}`)
+    .then((response) => {
+      if (response.status === 200) {
+        error.value = false;
+        const Userdata ={
+          role: null,
+          email: showEmail.value,
+          password: props.Password,
+          name: showEmail.value.split('.')[0],
+
+        } 
+        httpClient.post('/auth/register', Userdata)
+        .then((res) => {
+          if (res.status === 200) {
+            console.log('Usuario registrado exitosamente');
+          } else {
+            alert('Error al registrar el usuario');
+            return;
+          }
+        })
+        success.value = true;
+        setTimeout(() => {
+          success.value = false;
+          emit('onCloseValidation');
+        }, 3000);
+      } else {
         error.value = true;
-        console.error("Error verifying code:", response.data);
-    }*/
-  } catch (e) {
-    console.error(e);
-    alert('Error al verificar el código.');
-  }
+      }
+    })
+    .catch(() => {
+      error.value = true;
+    });
 };
 </script>
 
