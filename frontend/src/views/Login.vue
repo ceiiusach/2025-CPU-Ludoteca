@@ -5,7 +5,6 @@ import ImgLudoteca from '@/imgs/images.jpg';
 import FormRegister from '@/components/FormRegister.vue';
 import FormValidation from '@/components/FormValidation.vue';
 import MessageSuccess from '@/components/MessageSuccess.vue';
-import httpClient from '@/http-common';
 import { login } from '@/services/authService'
 
 
@@ -27,6 +26,10 @@ const handleLogin = async () => {
   error.value = ''
   try {
     await login({ email: email.value, password: password.value })
+    messageSuccess.value = true;
+    setTimeout(() => {
+      showModalSuccess.value = false;
+    }, 3000);
     router.push('/items')
   } catch (e) {
     error.value = e?.message ?? 'Error al iniciar sesión'
