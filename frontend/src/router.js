@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from "vue-router";
 
 import Login from "@/views/Login.vue";
 import Admin from "@/views/Admin.vue";
+import Items from "@/views/Items.vue";
+import CreateItem from "@/views/CreateItem.vue";
+import Loans from "@/views/Loans.vue";
 
 const routes = [
     {
@@ -20,12 +23,17 @@ const routes = [
     {
         path: "/items",
         name: "items",
-        component: () => import("@/views/items/index.vue")
+        component: Items
     },
         {
         path: "/items/create",
         name: "create-item",
-        component: () => import("@/views/items/create.vue")
+        component: CreateItem
+    },
+    {
+        path: "/loans",
+        name: "Loans",
+        component: Loans
     }
 ];
 
