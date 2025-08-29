@@ -9,19 +9,25 @@ import seminfcpu.ludoteca.exception.ItemNotAvailableException;
 import seminfcpu.ludoteca.persistence.LoanRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public final class LoanService {
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    private final Map<UUID, ScheduledFuture<?>> runningLoans = new LinkedHashMap<>();
     private final UserService userService;
     private final ItemService itemService;
+    private final EmailService emailService;
     private final LoanRepository repository;
 
-    public LoanService(UserService userService, ItemService itemService, @NotNull LoanRepository repository) {
+    public LoanService(@NotNull UserService userService, @NotNull ItemService itemService, @NotNull EmailService emailService, @NotNull LoanRepository repository) {
         this.userService = userService;
         this.itemService = itemService;
+        this.emailService = emailService;
         this.repository = repository;
     }
 
@@ -66,10 +72,26 @@ public final class LoanService {
 
     @NotNull
     public Loan update(@NotNull Loan loan) {
+        Loan oldLoan = getById(loan.getId()).orElseThrow();
+        if (oldLoan.isPending() && !loan.isPending()) {
+            oldLoan.setPending(false);
+            oldLoan.setDate(LocalDateTime.now());
+            Loan newLoan = repository.save(oldLoan);
+            runningLoans.put(newLoan.getId(), scheduler.schedule(() -> {
+                if (getById(newLoan.getId()).isPresent()) emailService.sendDelayNotice(newLoan);
+                runningLoans.remove(newLoan.getId());
+            }, newLoan.getEstimatedMinutes(), TimeUnit.MINUTES));
+            return newLoan;
+        }
+        oldLoan.setPending(loan.isPending());
         return repository.save(loan);
     }
 
     public void delete(@NotNull UUID id) {
         repository.deleteById(id);
+        if (runningLoans.containsKey(id)) {
+            runningLoans.get(id).cancel(true);
+            runningLoans.remove(id);
+        }
     }
 }

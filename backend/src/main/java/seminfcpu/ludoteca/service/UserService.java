@@ -24,12 +24,8 @@ public final class UserService implements UserDetailsService {
     }
 
     public User create(@NotNull User user) {
-        validateUsuario(user);
-        try {
-            return repository.save(user);
-        } catch (Exception e) {
-            throw new RuntimeException("Error al crear el usuario", e);
-        }
+        validate(user);
+        return repository.save(user);
     }
 
     public List<User> getAll() {
@@ -59,7 +55,7 @@ public final class UserService implements UserDetailsService {
         repository.deleteById(id);
     }
 
-    private void validateUsuario(User user) {
+    private void validate(@NotNull User user) {
         UUID id = user.getId();
         String correo = user.getEmail();
 
@@ -89,13 +85,12 @@ public final class UserService implements UserDetailsService {
     }
 
     private boolean isEmailValid(String email) {
-        System.out.println("Validando correo: " + email);
+        if (!email.endsWith("@usach.cl")) return false;
+
         String regex = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
-        boolean isValid = matcher.matches();
-        System.out.println("Correo válido: " + isValid);
-        return isValid;
+        return matcher.matches();
     }
 
     @Override

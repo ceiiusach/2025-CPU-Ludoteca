@@ -63,7 +63,6 @@ public final class AuthenticationController {
         try {
             return ResponseEntity.ok(service.register(request));
         } catch (Exception e) {
-            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
     }
