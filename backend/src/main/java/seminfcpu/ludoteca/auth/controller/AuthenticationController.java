@@ -65,10 +65,9 @@ public final class AuthenticationController {
      * </ul>
      */
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody LoginRequest request) {
         try {
-            request.setRole(UserRole.STUDENT);
-            return ResponseEntity.ok(userService.create(request));
+            return ResponseEntity.ok(service.register(request));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }

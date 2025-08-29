@@ -25,6 +25,7 @@ public final class UserService implements UserDetailsService {
     }
 
     public User create(@NotNull User user) {
+        user.setRole(UserRole.STUDENT);
         validate(user);
         return repository.save(user);
     }
