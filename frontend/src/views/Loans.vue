@@ -1,9 +1,10 @@
 <script setup>
 import Loan from '@/components/Loan.vue';
-import User from '@/components/User.vue';
 import httpClient from '@/http-common';
 import { shallowRef } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const loans = shallowRef([]);
 
 httpClient.get('/api/v1/admin/loan')
@@ -26,6 +27,8 @@ httpClient.get('/api/v1/admin/loan')
             });
         });
         loans.value = temp;
+    }).catch((reason) => {
+        if (reason.status == 403) router.push("/")
     });
 </script>
 
