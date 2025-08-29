@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import seminfcpu.ludoteca.entity.User;
 import seminfcpu.ludoteca.persistence.UserRepository;
@@ -24,19 +23,12 @@ public final class UserService implements UserDetailsService {
     }
 
     public User create(@NotNull User user) {
-        String encodedPassword = generateEncodedPassword(user.getPassword());
-        user.setPassword(encodedPassword);
         validateUsuario(user);
         try {
             return repository.save(user);
         } catch (Exception e) {
             throw new RuntimeException("Error al crear el usuario", e);
         }
-    }
-
-    private String generateEncodedPassword(String passsword) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        return encoder.encode(passsword);
     }
 
     public List<User> getAll() {

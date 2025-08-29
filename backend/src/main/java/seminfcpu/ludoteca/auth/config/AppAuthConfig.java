@@ -8,14 +8,17 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
+import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.HashMap;
 
 @Configuration
 public class AppAuthConfig {
     private final UserDetailsService service;
 
-    public AppAuthConfig(@NotNull UserDetailsService service){
+    public AppAuthConfig(@NotNull UserDetailsService service) {
         this.service = service;
     }
 
@@ -27,8 +30,10 @@ public class AppAuthConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public DelegatingPasswordEncoder passwordEncoder() {
+        HashMap<String, PasswordEncoder> encoders = new HashMap<>();
+        encoders.put("argon2", Argon2PasswordEncoder.defaultsForSpringSecurity_v5_8());
+        return new DelegatingPasswordEncoder("argon2", encoders);
     }
 
     @Bean

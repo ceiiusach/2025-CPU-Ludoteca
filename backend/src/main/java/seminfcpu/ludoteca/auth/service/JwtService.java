@@ -19,8 +19,8 @@ import java.util.function.Function;
 public class JwtService {
     @Value("${jwt.secret_key}")
     private String SECRET_KEY;
+    private static final long TOKEN_EXPIRATION_TIME_SECONDS = 60 * 30;
 
-    private long TOKEN_EXPIRATION_TIME_SECONDS = 60 * 60 * 24 * 5;
     public String getUsername(String token) {
         return getClaim(token, Claims::getSubject);
     }
@@ -29,18 +29,13 @@ public class JwtService {
         return getClaim(token, Claims::getExpiration);
     }
 
-    public <T> T getClaim(String token, Function<Claims, T> claimsFunction){
+    public <T> T getClaim(String token, Function<Claims, T> claimsFunction) {
         Claims claims = getAllClaims(token);
         return claimsFunction.apply(claims);
     }
 
     private Claims getAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        return Jwts.parserBuilder().setSigningKey(getSignInKey()).build().parseClaimsJws(token).getBody();
     }
 
     private Key getSignInKey() {
@@ -48,22 +43,15 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UserDetails userDetails){
+    public String generateToken(UserDetails userDetails) {
         return generateToken(new HashMap<>(), userDetails);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails){
-        return Jwts
-                .builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * TOKEN_EXPIRATION_TIME_SECONDS))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
+    public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername()).setIssuedAt(new Date(System.currentTimeMillis())).setExpiration(new Date(System.currentTimeMillis() + 1000 * TOKEN_EXPIRATION_TIME_SECONDS)).signWith(getSignInKey(), SignatureAlgorithm.HS256).compact();
     }
 
-    public boolean isValidToken(String token, UserDetails userDetails){
+    public boolean isValidToken(String token, UserDetails userDetails) {
         String username = getUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
