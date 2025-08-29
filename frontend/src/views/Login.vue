@@ -7,7 +7,6 @@ import FormValidation from '@/components/FormValidation.vue';
 import MessageSuccess from '@/components/MessageSuccess.vue';
 import { login } from '@/services/authService'
 
-
 const router = useRouter();
 const email = ref('');
 const emailRegister = ref('');
@@ -20,17 +19,16 @@ const showModalSuccess = ref(false);
 const loading = ref(false)
 const error = ref('')
 
-
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
   try {
     await login({ email: email.value, password: password.value })
-    messageSuccess.value = true;
+    showModalSuccess.value = true;
     setTimeout(() => {
-      showModalSuccess.value = false;
-    }, 3000);
-    router.push('/items')
+      //showModalSuccess.value = false;
+      router.push("/items");
+    }, 1000);
   } catch (e) {
     error.value = e?.message ?? 'Error al iniciar sesión'
   } finally {
