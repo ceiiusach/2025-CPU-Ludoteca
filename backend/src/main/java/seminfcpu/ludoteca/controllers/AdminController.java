@@ -193,6 +193,17 @@ public final class AdminController {
     }
 
     /**
+     * Actualiza los datos de un préstamo existente.
+     *
+     * @param loan Objeto {@link Loan} con la información actualizada. Debe contener el ID para poder ser identificado.
+     * @return {@link ResponseEntity} con el objeto {@link Loan} actualizado y código <b>200 OK</b>.
+     */
+    @PutMapping("/loan")
+    public ResponseEntity<Loan> updateLoan(@RequestBody Loan loan) {
+        return ResponseEntity.ok(loanService.update(loan));
+    }
+
+    /**
      * Elimina un préstamo existente a partir de su ID.
      *
      * @param id Identificador único del préstamo a eliminar.
